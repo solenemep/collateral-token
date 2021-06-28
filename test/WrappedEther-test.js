@@ -13,7 +13,7 @@ describe('WrappedEther', async function () {
   const VALUE = 4;
 
   beforeEach(async function () {
-    [dev, reserve, alice] = await ethers.getSigners();
+    [dev, alice] = await ethers.getSigners();
     WrappedEther = await ethers.getContractFactory('WrappedEther');
     wrappedEther = await WrappedEther.connect(dev).deploy();
     await wrappedEther.deployed();

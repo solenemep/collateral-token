@@ -4,15 +4,12 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
-/// @title Token
+/// @title Wrapped Ether
 /// @author Solène PETTIER
 /// @notice WrappedEther is a basic ERC20
-/// @dev A function to return token owner's address has been added
 
 contract WrappedEther is ERC20 {
     using Address for address payable;
-
-    address private _reserve;
 
     // Events
     event Deposited(address indexed sender, uint256 amount);
