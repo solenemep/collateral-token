@@ -18,10 +18,7 @@ contract WrappedEther is ERC20 {
     event Deposited(address indexed sender, uint256 amount);
     event Withdrawed(address indexed sender, uint256 amount);
 
-    constructor(address reserve_, uint256 initialSupply) ERC20("WrappedEther", "WETH") {
-        _reserve = reserve_;
-        _mint(reserve_, initialSupply);
-    }
+    constructor() ERC20("WrappedEther", "WETH") {}
 
     // functions
     /// @notice Receive function to directly send ether to switch
@@ -51,13 +48,5 @@ contract WrappedEther is ERC20 {
         _burn(msg.sender, amount);
         payable(msg.sender).sendValue(amount);
         emit Withdrawed(msg.sender, amount);
-    }
-
-    // getter
-    /// @notice the reserve is where all tokens have been minted
-    /// @param
-    /// @return token owner's address
-    function reserve() public view returns (address) {
-        return _reserve;
     }
 }

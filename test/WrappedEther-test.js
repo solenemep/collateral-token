@@ -6,17 +6,16 @@ const { expect } = require('chai');
 const { ethers } = require('hardhat');
 
 describe('WrappedEther', async function () {
-  let WrappedEther, wrappedEther, dev, reserve, alice;
+  let WrappedEther, wrappedEther, dev, alice;
 
   const NAME = 'WrappedEther';
   const SYMBOL = 'WETH';
-  const INIT_SUPPLY = 10 ** 9;
   const VALUE = 4;
 
   beforeEach(async function () {
     [dev, reserve, alice] = await ethers.getSigners();
     WrappedEther = await ethers.getContractFactory('WrappedEther');
-    wrappedEther = await WrappedEther.connect(dev).deploy(reserve.address, INIT_SUPPLY);
+    wrappedEther = await WrappedEther.connect(dev).deploy();
     await wrappedEther.deployed();
   });
 
@@ -26,15 +25,6 @@ describe('WrappedEther', async function () {
     });
     it(`Should have symbol ${SYMBOL}`, async function () {
       expect(await wrappedEther.symbol()).to.equal(SYMBOL);
-    });
-    it(`Should have reserve set`, async function () {
-      expect(await wrappedEther.reserve()).to.equal(reserve.address);
-    });
-    it(`Should have total supply ${INIT_SUPPLY.toString()}`, async function () {
-      expect(await wrappedEther.totalSupply()).to.equal(INIT_SUPPLY);
-    });
-    it(`Should mint initial supply ${INIT_SUPPLY.toString()} to reserve`, async function () {
-      expect(await wrappedEther.balanceOf(reserve.address)).to.equal(INIT_SUPPLY);
     });
   });
   describe('receive', async function () {
