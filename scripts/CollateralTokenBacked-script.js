@@ -5,9 +5,7 @@ const { deployed } = require('./deployed');
 const { getContract } = require('./getContract');
 
 async function main() {
-  const INIT_SUPPLY = hre.ethers.utils.parseEther('1000000');
-
-  const [deployer, reserve] = await hre.ethers.getSigners();
+  const [deployer] = await hre.ethers.getSigners();
   console.log('Deploying contracts with the account:', deployer.address);
 
   const collateralTokenAddress = await getContract('CollateralToken', 'kovan');

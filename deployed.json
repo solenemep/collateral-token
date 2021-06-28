@@ -1,1 +1,5 @@
-{"Greeter":{"kovan":{"address":"0x21E83e6136CE6763eCdF4f342897b2Fa2E31156b"}}}
+{
+  "WrappedEther": { "kovan": { "address": "0x2d069C6a98B69d26EF00c0A3f3Ef8d7ff41430c7" } },
+  "CollateralToken": { "kovan": { "address": "0xd123a958Cf72C10c06f67B06836d23d92C4c365F" } },
+  "CollateralTokenBacked": { "kovan": { "address": "0xA293994F655473dC48D94641c4c5E14F75763951" } }
+}
