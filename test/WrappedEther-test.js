@@ -6,14 +6,15 @@ const { expect } = require('chai');
 const { ethers } = require('hardhat');
 
 describe('WrappedEther', async function () {
-  let WrappedEther, wrappedEther, dev, reserve;
+  let WrappedEther, wrappedEther, dev, reserve, alice;
 
   const NAME = 'WrappedEther';
   const SYMBOL = 'WETH';
   const INIT_SUPPLY = 10 ** 9;
+  const VALUE = 4;
 
   beforeEach(async function () {
-    [dev, reserve] = await ethers.getSigners();
+    [dev, reserve, alice] = await ethers.getSigners();
     WrappedEther = await ethers.getContractFactory('WrappedEther');
     wrappedEther = await WrappedEther.connect(dev).deploy(reserve.address, INIT_SUPPLY);
     await wrappedEther.deployed();
@@ -34,6 +35,53 @@ describe('WrappedEther', async function () {
     });
     it(`Should mint initial supply ${INIT_SUPPLY.toString()} to reserve`, async function () {
       expect(await wrappedEther.balanceOf(reserve.address)).to.equal(INIT_SUPPLY);
+    });
+  });
+  describe('receive', async function () {
+    it('Transfers directly', async function () {
+      expect(
+        await alice.sendTransaction({ to: wrappedEther.address, value: VALUE, gasPrice: 0 })
+      ).to.changeEtherBalance(wrappedEther, VALUE);
+    });
+  });
+  describe('deposit', async function () {
+    it('Changes ETH balances', async function () {
+      const tx = await wrappedEther.connect(alice).deposit({ value: VALUE, gasPrice: 0 });
+      expect(tx).to.changeEtherBalance(alice, -VALUE);
+      expect(tx).to.changeEtherBalance(wrappedEther, VALUE);
+    });
+    it('Changes WETH balances', async function () {
+      await wrappedEther.connect(alice).deposit({ value: VALUE, gasPrice: 0 });
+      expect(await wrappedEther.balanceOf(alice.address)).to.equal(VALUE);
+    });
+    it('Emits Deposited event', async function () {
+      await expect(wrappedEther.connect(alice).deposit({ value: VALUE, gasPrice: 0 }))
+        .to.emit(wrappedEther, 'Deposited')
+        .withArgs(alice.address, VALUE);
+    });
+  });
+  describe('withdraw', async function () {
+    it('Reverts if balance < amount', async function () {
+      await expect(wrappedEther.connect(alice).withdraw(VALUE)).to.be.revertedWith(
+        'WrappedEther : you can not withdraw more than you have'
+      );
+    });
+    it('Changes ETH balances', async function () {
+      await wrappedEther.connect(alice).deposit({ value: VALUE, gasPrice: 0 });
+      const tx = await wrappedEther.connect(alice).withdraw(VALUE);
+      expect(tx).to.changeEtherBalance(alice, VALUE);
+      expect(tx).to.changeEtherBalance(wrappedEther, -VALUE);
+    });
+    it('Changes WETH balances', async function () {
+      await wrappedEther.connect(alice).deposit({ value: VALUE, gasPrice: 0 });
+      await wrappedEther.connect(alice).withdraw(VALUE);
+      expect(await wrappedEther.balanceOf(alice.address)).to.equal(0);
+    });
+    it('Emits Withdrawed event', async function () {
+      await wrappedEther.connect(alice).deposit({ value: VALUE, gasPrice: 0 });
+      await expect(wrappedEther.connect(alice).withdraw(VALUE / 2))
+        .to.emit(wrappedEther, 'Withdrawed')
+        .withArgs(alice.address, VALUE / 2);
     });
   });
 });
