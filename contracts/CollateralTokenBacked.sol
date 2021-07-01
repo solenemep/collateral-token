@@ -3,8 +3,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./CollateralToken.sol";
+// import "./CollateralToken.sol";
 
 /// @title Collateral Token Backed
 /// @author Solène PETTIER
@@ -14,14 +15,15 @@ contract CollateralTokenBacked is ERC20 {
     using Address for address payable;
 
     // State variables
-    CollateralToken private _collateralToken;
+    IERC20 private _collateralToken;
+    //CollateralToken private _collateralToken;
 
     // Events
     event Deposited(address indexed sender, uint256 amount);
     event Withdrawed(address indexed sender, uint256 amount);
 
     constructor(address collateralTokenAddress) ERC20("CollateralTokenBacked", "CTB") {
-        _collateralToken = CollateralToken(collateralTokenAddress);
+        _collateralToken = IERC20(collateralTokenAddress);
     }
 
     /// @notice Private function called throught receive and deposit functions
@@ -46,7 +48,7 @@ contract CollateralTokenBacked is ERC20 {
     /// @notice Allow user to get Collateral Token address
     /// @dev Function is a getter to return Collateral Token address
     /// @return _token Token
-    function collateralToken() public view returns (CollateralToken) {
+    function collateralToken() public view returns (IERC20) {
         return _collateralToken;
     }
 }
